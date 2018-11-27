@@ -2,6 +2,7 @@ import sys
 from flask import Flask, request
 import telepot
 from telepot.loop import OrderedWebhook
+from MessageHandler import  MessageHandler
 
 """
 $ python2.7 flask_skeleton.py <token> <listening_port> <webhook_url>
@@ -12,7 +13,8 @@ Webhook path is '/webhook', therefore:
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     print('Chat Message:', content_type, chat_type, chat_id)
-    bot.sendMessage(chat_id, "Okay got your message!") # Temporary for development
+    user_msg = MessageHandler(msg)
+    bot.sendMessage(chat_id=chat_id, text=user_msg.reply()) # Temporary for development
 
 def on_callback_query(msg):
     query_id, from_id, data = telepot.glance(msg, flavor='callback_query')
