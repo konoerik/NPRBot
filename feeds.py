@@ -1,5 +1,6 @@
 import feedparser
-
+import sqlite3
+from sqlite3 import Error
 # TODO
 # Create SQLite database
 # Update feeds from URL, parse and store to database
@@ -8,6 +9,24 @@ import feedparser
 # SCOPE (can be changed)
 #     To create an RssFeed instance for each RSS feed, and have them run in their own thread
 #     That way, even if some URL is unresponsive, the others will not be affected
+
+
+
+"""
+def create_connection(db_file):
+    #create a database connection to a SQLite database 
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+
+    except Error as e:
+        print(e)
+
+
+created_db=create_connection("useraudio.db")
+
+"""
+
 
 FEEDS = {
     "Planet Money" : "https://www.npr.org/templates/rss/podcast.php?id=510289",
