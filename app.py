@@ -3,18 +3,25 @@ from flask import Flask, request
 import telepot
 from telepot.loop import OrderedWebhook
 from MessageHandler import  MessageHandler
+from time import sleep
 
 """
-$ python2.7 flask_skeleton.py <token> <listening_port> <webhook_url>
-Webhook path is '/webhook', therefore:
-<webhook_url>: https://<base>/webhook
+Skeleton code from Telepot API project adapted for SWE6623 Telegram Bot project
+
+How to run from cmd:
+    $ python app.py <token> <listening_port> <webhook_url>
 """
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     print('Chat Message:', content_type, chat_type, chat_id)
-    user_msg = MessageHandler(msg)
-    bot.sendMessage(chat_id=chat_id, text=user_msg.reply()) # Temporary for development
+    user_msg = MessageHandler(msg).reply()
+    if type(user_msg) == list:
+        for msg in user_msg:
+            bot.sendMessage(chat_id=chat_id, text=msg)
+            sleep(0.1)
+    else:
+        bot.sendMessage(chat_id=chat_id, text=user_msg)
 
 def on_callback_query(msg):
     query_id, from_id, data = telepot.glance(msg, flavor='callback_query')
