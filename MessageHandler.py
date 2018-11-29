@@ -1,4 +1,5 @@
 from feeds import  FEEDS
+import sqlite3
 
 class MessageHandler():
     """
@@ -29,8 +30,9 @@ class MessageHandler():
         self._text = msg['text']
 
         # extra parsing
+        # the idea is: for commands like "/host guy raz", /host is the cmd and 'guy raz' is the argument
         self._cmd = self._text.split()[0]
-        self._arg = self._text.split()[1:]
+        self._arg = ' '.join(self._text.split()[1:])
 
     def reply(self):
         if self._cmd == '/help':
@@ -51,19 +53,25 @@ class MessageHandler():
     def help(self):
         """Return a simple help message"""
 
-        message = """
-        Use this bot to look up podcasts from NPR!
-        For a list of available commands, type '/' and follow the prompt.
-        Have fun! 
+        message = """Use this bot to look up podcasts from NPR! For a list of available commands, type '/' and follow the prompt. Have fun! 
         """
 
         return message
 
     def recent(self):
         """Query the DB for the last ten items and return"""
+        db_conn = self.get_db_connector()
 
-        temp_list = ['abc', 'def', '123']
-        return "\n".join(temp_list)
+        with db_conn:
+            db_cur = db_conn.cursor()
+            db_cur.execute("SELECT * from test_table order by episode_date desc limit 10;")
+            rows = db_cur.fetchall()
+
+        formatted_message_list = []
+        for row in rows:
+            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
+
+        return formatted_message_list
 
     def list(self):
         """Return a list of all podcast series being tracked"""
@@ -72,17 +80,55 @@ class MessageHandler():
 
     def host(self):
         """Query the DB for podcast series where the host matches the description"""
+        db_conn = self.get_db_connector()
+        with db_conn:
+            db_cur = db_conn.cursor()
+            db_cur.execute("SELECT * from test_table where pod_description like '%{}%' limit 10;".format(self._arg))
+            rows = db_cur.fetchall()
 
-        temp_list = ['pod_a', 'pod_b']
-        return "\n".join(temp_list)
+        formatted_message_list = []
+        for row in rows:
+            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
+
+        return formatted_message_list
 
     def guest(self):
         """Query the DB for episodes where the guest matches the description"""
 
-        temp_list = ['episode_a', 'episode_b']
-        return "\n".join(temp_list)
+        db_conn = self.get_db_connector()
+        with db_conn:
+            db_cur = db_conn.cursor()
+            db_cur.execute("SELECT * from test_table where episode_description like '%{}%' limit 10;".format(self._arg))
+            rows = db_cur.fetchall()
+
+        formatted_message_list = []
+        for row in rows:
+            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
+
+        return formatted_message_list
 
     def last(self):
         """Query the DB for the most recent episode for the given podcast series"""
 
-        return "episode_255"
+        db_conn = self.get_db_connector()
+        with db_conn:
+            db_cur = db_conn.cursor()
+            db_cur.execute("SELECT * from test_table where pod_title like '%{}%' order by episode_date desc limit 1;".format(self._arg))
+            rows = db_cur.fetchall()
+
+        formatted_message_list = []
+        for row in rows:
+            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
+
+        return formatted_message_list
+
+    def get_db_connector(self, db_file='useraudio.db'):
+        """Not needed by all commands, use as needed"""
+
+        try:
+            conn = sqlite3.connect(db_file)
+            return conn
+        except sqlite3.Error as e:
+            print(e)
+
+        return None
