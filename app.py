@@ -4,6 +4,7 @@ import telepot
 from telepot.loop import OrderedWebhook
 from MessageHandler import  MessageHandler
 from time import sleep
+import feeds
 
 """
 Skeleton code from Telepot API project adapted for SWE6623 Telegram Bot project
@@ -69,4 +70,5 @@ if __name__ == '__main__':
         pass
 
     webhook.run_as_thread()
+
 app.run(port=PORT, debug=True)
