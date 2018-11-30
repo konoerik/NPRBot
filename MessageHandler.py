@@ -34,6 +34,8 @@ class MessageHandler():
         self._cmd = self._text.split()[0]
         self._arg = ' '.join(self._text.split()[1:])
 
+
+
     def reply(self):
         if self._cmd == '/help':
             return self.help()
@@ -53,25 +55,14 @@ class MessageHandler():
     def help(self):
         """Return a simple help message"""
 
-        message = """Use this bot to look up podcasts from NPR! For a list of available commands, type '/' and follow the prompt. Have fun! 
-        """
+        message = """Use this bot to look up podcasts from NPR! For a list of available commands, type '/' and follow the prompt. Have fun! """
 
         return message
 
     def recent(self):
         """Query the DB for the last ten items and return"""
-        db_conn = self.get_db_connector()
 
-        with db_conn:
-            db_cur = db_conn.cursor()
-            db_cur.execute("SELECT * from test_table order by episode_date desc limit 10;")
-            rows = db_cur.fetchall()
-
-        formatted_message_list = []
-        for row in rows:
-            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
-
-        return formatted_message_list
+        return self.query_db("SELECT * from test_table order by episode_date desc limit 10;")
 
     def list(self):
         """Return a list of all podcast series being tracked"""
@@ -80,47 +71,19 @@ class MessageHandler():
 
     def host(self):
         """Query the DB for podcast series where the host matches the description"""
-        db_conn = self.get_db_connector()
-        with db_conn:
-            db_cur = db_conn.cursor()
-            db_cur.execute("SELECT * from test_table where pod_description like '%{}%' limit 10;".format(self._arg))
-            rows = db_cur.fetchall()
 
-        formatted_message_list = []
-        for row in rows:
-            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
-
-        return formatted_message_list
+        return self.query_db("SELECT * from test_table where pod_description like '%{}%' limit 10;".format(self._arg))
 
     def guest(self):
         """Query the DB for episodes where the guest matches the description"""
 
-        db_conn = self.get_db_connector()
-        with db_conn:
-            db_cur = db_conn.cursor()
-            db_cur.execute("SELECT * from test_table where episode_description like '%{}%' limit 10;".format(self._arg))
-            rows = db_cur.fetchall()
-
-        formatted_message_list = []
-        for row in rows:
-            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
-
-        return formatted_message_list
+        return self.query_db("SELECT * from test_table where episode_description like '%{}%' limit 10;".format(self._arg))
 
     def last(self):
         """Query the DB for the most recent episode for the given podcast series"""
 
-        db_conn = self.get_db_connector()
-        with db_conn:
-            db_cur = db_conn.cursor()
-            db_cur.execute("SELECT * from test_table where pod_title like '%{}%' order by episode_date desc limit 1;".format(self._arg))
-            rows = db_cur.fetchall()
+        return self.query_db("SELECT * from test_table where pod_title like '%{}%' order by episode_date desc limit 1;".format(self._arg))
 
-        formatted_message_list = []
-        for row in rows:
-            formatted_message_list.append("{}, {}, {}\n".format(row[0], row[2], row[5]))
-
-        return formatted_message_list
 
     def get_db_connector(self, db_file='useraudio.db'):
         """Not needed by all commands, use as needed"""
@@ -132,3 +95,20 @@ class MessageHandler():
             print(e)
 
         return None
+
+
+    def query_db(self, sql_cmd):
+        """Querry db and return list of PODCAST_TITLE, EPISODE_SUMMARY and URL"""
+
+        db_conn = self.get_db_connector()
+        with db_conn:
+            db_cur = db_conn.cursor()
+            db_cur.execute(sql_cmd)
+            rows = db_cur.fetchall()
+
+        formatted_message_list = []
+        for row in rows:
+            formatted_message_list.append("{}, {}, {}".format(row[0], row[2], row[5]))
+            # TODO: modify using HTML Templates
+
+        return formatted_message_list
