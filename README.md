@@ -23,4 +23,6 @@ A Telegram Bot that helps users search and listen to podcasts from NPR
 5. At this point it will just return the same message always
 
 ## How to deploy online (TODO)
-## Examples (TODO)
+## Screenshots
+![Alt text](pics/commands.png "Recent Command")
+![Alt text](pics/recent_example.png "Recent Command")
