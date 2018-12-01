@@ -24,5 +24,5 @@ A Telegram Bot that helps users search and listen to podcasts from NPR
 
 ## How to deploy online (TODO)
 ## Screenshots
-![Alt text](pics/commands.png "Recent Command")
-![Alt text](pics/recent_example.png "Recent Command")
+![Alt text](https://github.com/konoerik/NPRBot/blob/master/pics/commands.PNG "Commands")
+![Alt text](https://github.com/konoerik/NPRBot/blob/master/pics/recent_example.PNG "Recent Command")
